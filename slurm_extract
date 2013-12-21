@@ -1,0 +1,40 @@
+#!/bin/sh
+#SBATCH --partition=general-compute
+#SBATCH --time=00:05:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=2G
+#SBATCH --job-name="Hashtable"
+#SBATCH --output=1Hashtable.txt
+##SBATCH --mail-user=dbharadw@buffalo.edu
+##SBATCH --constraint=CPU-L5630
+#SBATCH --mail-type=ALL
+#SBATCH --exclusive
+##SBATCH --requeue
+#Specifies that the job will be requeued after a node failure.
+#The default is that the job will not be requeued.
+
+
+#export | grep SLURM
+echo "SLURM_JOBID="$SLURM_JOBID
+echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
+echo "SLURM_NNODES"=$SLURM_NNODES
+echo "SLURMTMPDIR="$SLURMTMPDIR
+
+echo "working directory = "$SLURM_SUBMIT_DIR module load intel/13.1
+module load intel-mpi/4.1.1
+module list
+ulimit -s unlimited
+#
+#export I_MPI_DEBUG-4
+#NPROCS=`srun --nodes=${SLURM_NNODES} bash -c 'hostname' |wc -l`
+#echo "NPROCS="$NPROCS
+echo "Launch vector with srun"
+export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi.so
+export OMP_NUM_THREADS=2
+mpirun -np 1 ./Hashtable
+
+
+
+#
+echo "All Done!"
